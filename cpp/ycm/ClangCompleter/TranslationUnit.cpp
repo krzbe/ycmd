@@ -386,6 +386,35 @@ void TranslationUnit::Reparse( std::vector< CXUnsavedFile > &unsaved_files,
   UpdateLatestDiagnostics();
 }
 
+std::vector< Range > TranslationUnit::GetSkippedRanges()
+{
+  CXSourceRangeList *list = 0;
+  std::vector< Range > locations;
+
+  unique_lock< mutex > lock( clang_access_mutex_ );
+
+  if ( !clang_translation_unit_ )
+    return locations;
+
+  list = clang_getSkippedRanges(this->clang_translation_unit_,
+      (CXFile) this->filename_.data());
+
+  if(!list)
+    return locations;
+
+  for( unsigned int i = 0; i < list->count; i++ )
+  {
+    Range range;
+    // FIXME: is it valid?
+    range.start_.line_number_=list->ranges[i].begin_int_data;
+    range.end_.line_number_=list->ranges[i].end_int_data;
+
+    locations.push_back(range);
+  }
+
+  return locations;
+}
+
 void TranslationUnit::UpdateLatestDiagnostics() {
   unique_lock< mutex > lock1( clang_access_mutex_ );
   unique_lock< mutex > lock2( diagnostics_mutex_ );
