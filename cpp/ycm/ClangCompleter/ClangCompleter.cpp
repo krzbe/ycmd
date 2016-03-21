@@ -108,16 +108,22 @@ std::vector< Diagnostic > ClangCompleter::UpdateTranslationUnit(
 }
 
 std::vector< Range >
-ClangCompleter::GetSkippedRanges(const std::string &filename)
+ClangCompleter::GetSkippedRanges(const std::string &filename,
+  const std::vector< UnsavedFile > &unsaved_files,
+  const std::vector< std::string > &flags )
 {
+  bool translation_unit_created=false;
 
   ReleaseGil unlock;
-  shared_ptr< TranslationUnit > unit = translation_unit_store_.Get( filename );
-
+  shared_ptr< TranslationUnit > unit = translation_unit_store_.GetOrCreate(
+                                                filename,
+                                                unsaved_files,
+                                                flags,
+                                                translation_unit_created);
   if ( !unit )
     return std::vector< Range >();
 
-  return unit->GetSkippedRanges();
+  return unit->GetSkippedRanges(unsaved_files, !translation_unit_created);
 }
 
 std::vector< CompletionData >

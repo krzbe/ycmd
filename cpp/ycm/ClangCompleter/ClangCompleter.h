@@ -109,7 +109,10 @@ public:
 
   void DeleteCachesForFile( const std::string &filename );
 
-  std::vector< Range > GetSkippedRanges( const std::string &filename );
+  std::vector< Range > GetSkippedRanges(
+    const std::string &filename,
+    const std::vector< UnsavedFile > &unsaved_files,
+    const std::vector< std::string > &flags );
 
 private:
 

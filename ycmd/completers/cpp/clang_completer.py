@@ -145,6 +145,8 @@ class ClangCompleter( Completer ):
                                 reparse = False,
                                 func = 'GetDocsForLocationInFile',
                                 response_builder = _BuildGetDocResponse ) ),
+      'GetSkippedCode'          : ( lambda self, request_data, args:
+         self._GetSkippedCode( request_data ) ),
     }
 
 
@@ -379,6 +381,22 @@ class ClangCompleter( Completer ):
                                    filename )
     client_data = request_data.get( 'extra_conf_data', None )
     return self._flags.FlagsForFile( filename, client_data = client_data )
+
+  def _GetSkippedCode( self, request_data ):
+    flags = self._FlagsForRequest( request_data )
+    if not flags:
+      raise RuntimeError( NO_COMPILE_FLAGS_MESSAGE )
+
+    filename = ToCppStringCompatible( request_data[ 'filepath' ] )
+    unsaved_files = self.GetUnsavedFilesVector( request_data )
+
+    ranges = self._completer.GetSkippedRanges( filename, unsaved_files, flags)
+
+    return responses.BuildDisplayMessageResponse(
+            "SIZE: %d, %s" % (len(ranges), 
+                str( [ ((ra.start_.line_number_, ra.end_.line_number_)) for ra in ranges])
+                   )
+            )
 
 
 def ConvertCompletionData( completion_data ):
