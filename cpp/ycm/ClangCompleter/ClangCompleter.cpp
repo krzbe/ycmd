@@ -112,18 +112,16 @@ ClangCompleter::GetSkippedRanges(const std::string &filename,
   const std::vector< UnsavedFile > &unsaved_files,
   const std::vector< std::string > &flags )
 {
-  bool translation_unit_created=false;
 
   ReleaseGil unlock;
   shared_ptr< TranslationUnit > unit = translation_unit_store_.GetOrCreate(
                                                 filename,
                                                 unsaved_files,
-                                                flags,
-                                                translation_unit_created);
+                                                flags);
   if ( !unit )
     return std::vector< Range >();
 
-  return unit->GetSkippedRanges(unsaved_files, !translation_unit_created);
+  return unit->GetSkippedRanges();
 }
 
 std::vector< CompletionData >

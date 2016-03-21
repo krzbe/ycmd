@@ -386,13 +386,8 @@ void TranslationUnit::Reparse( std::vector< CXUnsavedFile > &unsaved_files,
   UpdateLatestDiagnostics();
 }
 
-std::vector< Range > TranslationUnit::GetSkippedRanges(
-		  const std::vector< UnsavedFile > &unsaved_files,
-		  bool reparse )
+std::vector< Range > TranslationUnit::GetSkippedRanges()
 {
-  if ( reparse )
-    Reparse( unsaved_files );
-
   CXSourceRangeList *list = 0;
   std::vector< Range > locations;
 

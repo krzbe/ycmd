@@ -102,10 +102,7 @@ public:
     const std::vector< UnsavedFile > &unsaved_files,
     bool reparse = true );
 
-  std::vector< Range > GetSkippedRanges(
-    const std::vector< UnsavedFile > &unsaved_files,
-    bool reparse = true );
-
+  std::vector< Range > GetSkippedRanges();
 
 private:
   void Reparse( std::vector< CXUnsavedFile > &unsaved_files );
