@@ -109,6 +109,8 @@ public:
 
   void DeleteCachesForFile( const std::string &filename );
 
+  std::vector< Range > GetSkippedRanges( const std::string &filename );
+
 private:
 
   /////////////////////////////

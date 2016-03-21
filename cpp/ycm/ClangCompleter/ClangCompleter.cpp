@@ -107,6 +107,18 @@ std::vector< Diagnostic > ClangCompleter::UpdateTranslationUnit(
   return std::vector< Diagnostic >();
 }
 
+std::vector< Range >
+ClangCompleter::GetSkippedRanges(const std::string &filename)
+{
+
+  ReleaseGil unlock;
+  shared_ptr< TranslationUnit > unit = translation_unit_store_.Get( filename );
+
+  if ( !unit )
+    return std::vector< Range >();
+
+  return unit->GetSkippedRanges();
+}
 
 std::vector< CompletionData >
 ClangCompleter::CandidatesForLocationInFile(

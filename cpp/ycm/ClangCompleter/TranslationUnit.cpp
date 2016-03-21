@@ -396,21 +396,23 @@ std::vector< Range > TranslationUnit::GetSkippedRanges()
   if ( !clang_translation_unit_ )
     return locations;
 
-  list = clang_getSkippedRanges(this->clang_translation_unit_,
-      (CXFile) this->filename_.data());
+  CXFile file = clang_getFile( clang_translation_unit_, filename_.c_str() );
+
+  list = clang_getSkippedRanges( clang_translation_unit_, file );
 
   if(!list)
     return locations;
 
-  for( unsigned int i = 0; i < list->count; i++ )
+  for( uint i = 0; i < list->count; i++ )
   {
-    Range range;
-    // FIXME: is it valid?
-    range.start_.line_number_=list->ranges[i].begin_int_data;
-    range.end_.line_number_=list->ranges[i].end_int_data;
+    const CXSourceLocation start_location = clang_getRangeStart( list->ranges[i]) ;
+    const CXSourceLocation end_location = clang_getRangeEnd( list->ranges[i]) ;
+    const Range range(start_location, end_location);
 
-    locations.push_back(range);
+    locations.push_back( range );
   }
+
+  clang_disposeSourceRangeList( list );
 
   return locations;
 }

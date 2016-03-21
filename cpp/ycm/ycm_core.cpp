@@ -108,7 +108,9 @@ BOOST_PYTHON_MODULE(ycm_core)
     .def( "GetFixItsForLocationInFile",
           &ClangCompleter::GetFixItsForLocationInFile )
     .def( "GetDocsForLocationInFile",
-          &ClangCompleter::GetDocsForLocationInFile );
+          &ClangCompleter::GetDocsForLocationInFile )
+    .def( "GetSkippedRanges",
+	  &ClangCompleter::GetSkippedRanges );
 
   enum_< CompletionKind >( "CompletionKind" )
     .value( "STRUCT", STRUCT )
