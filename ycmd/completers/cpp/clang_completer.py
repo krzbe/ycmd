@@ -144,9 +144,7 @@ class ClangCompleter( Completer ):
          self._GetSemanticInfo( request_data,
                                 reparse = False,
                                 func = 'GetDocsForLocationInFile',
-                                response_builder = _BuildGetDocResponse ) ),
-      'GetSkippedCode'          : ( lambda self, request_data, args:
-         self._GetSkippedCode( request_data ) ),
+                                response_builder = _BuildGetDocResponse ) )
     }
 
 
@@ -329,8 +327,13 @@ class ClangCompleter( Completer ):
 
     diagnostics = _FilterDiagnostics( diagnostics )
     self._diagnostic_store = DiagnosticsToDiagStructure( diagnostics )
-    return [ responses.BuildDiagnosticData( x ) for x in
-             diagnostics[ : self._max_diagnostics_to_display ] ]
+
+    skipped_ranges = self._GetSkippedCode( request_data )
+
+    return {'diagnostics':[ responses.BuildDiagnosticData( x ) for x in
+             diagnostics[ : self._max_diagnostics_to_display ] ],
+             'skipped_ranges': skipped_ranges
+             }
 
 
   def OnBufferUnload( self, request_data ):
@@ -392,11 +395,8 @@ class ClangCompleter( Completer ):
 
     ranges = self._completer.GetSkippedRanges( filename, unsaved_files, flags)
 
-    return responses.BuildDisplayMessageResponse(
-            "SIZE: %d, %s" % (len(ranges), 
-                str( [ ((ra.start_.line_number_, ra.end_.line_number_)) for ra in ranges])
-                   )
-            )
+    # we should skip first line of given range (preprocessor directive)
+    return [ ((ra.start_.line_number_+1, ra.end_.line_number_)) for ra in ranges ]
 
 
 def ConvertCompletionData( completion_data ):
